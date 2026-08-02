@@ -6,4 +6,5 @@
 * { box-sizing: border-box; }
 body { min-height: 100vh; background: #f0f9ff; color: #0f172a; }
 button, a, input, select { -webkit-tap-highlight-color: transparent; }
+@media (max-width: 767px) { button, a[role="button"], [role="tab"], [role="option"] { min-height: 48px; } }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #38bdf8; outline-offset: 2px; }

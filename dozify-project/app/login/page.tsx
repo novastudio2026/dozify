@@ -4,6 +4,7 @@ import { HeartPulse, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,6 +26,6 @@ export default function LoginPage() {
     <button onClick={demoLogin} className="mt-3 h-14 w-full rounded-xl bg-sky-600 text-base font-bold text-white hover:bg-sky-700">Demo olarak devam et</button>
     {message && <p className="mt-4 rounded-xl bg-sky-50 p-3 text-sm leading-6 text-sky-900">{message}</p>}
     <div className="mt-8 flex items-start gap-2 text-left text-sm leading-6 text-slate-500"><ShieldCheck className="mt-1 shrink-0 text-emerald-600" size={17} />İlk 3 gün tüm Plus özelliklerini deneyin. Sağlık verileriniz size aittir.</div>
-    <p className="mt-8 text-sm text-slate-400">powered by Nova Studio</p>
+    <p className="mt-8 text-sm text-slate-400">powered by Nova Studio</p><p className="mt-3 text-xs leading-5 text-slate-500"><strong>Tıbbi tavsiye değildir.</strong> <Link href="/privacy" className="font-semibold text-sky-700 underline">Gizlilik Politikası</Link></p>
   </section></main>;
 }
