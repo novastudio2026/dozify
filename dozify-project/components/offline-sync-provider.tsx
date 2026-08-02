@@ -3,10 +3,13 @@
 import { useEffect } from "react";
 import { flushOfflineDoseQueue } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
+import { startNotificationEngine } from "@/lib/notification-engine";
 
 export function OfflineSyncProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+    let stopNotificationEngine: () => void = () => {};
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").then(() => { stopNotificationEngine = startNotificationEngine(); }).catch(() => { stopNotificationEngine = startNotificationEngine(); });
+    else stopNotificationEngine = startNotificationEngine();
     const sync = async (dose: { medicationId: string; takenAt: string; injectionSite?: string }) => {
       const supabase = createClient();
       if (!supabase) throw new Error("Supabase is not configured");
@@ -15,7 +18,7 @@ export function OfflineSyncProvider({ children }: { children: React.ReactNode })
     };
     const onOnline = () => void flushOfflineDoseQueue(sync);
     onOnline(); window.addEventListener("online", onOnline);
-    return () => window.removeEventListener("online", onOnline);
+    return () => { window.removeEventListener("online", onOnline); stopNotificationEngine(); };
   }, []);
   return children;
 }
