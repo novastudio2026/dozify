@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useProfile } from "@/components/profile-provider";
 
 const links = [
-  ["/dashboard", "Bugün"], ["/medications", "İlaçlarım"], ["/labs", "Tahlillerim"], ["/family", "Aile"], ["/settings", "Ayarlar"],
+  ["/dashboard", "Bugün"], ["/medications", "İlaçlarım"], ["/labs", "Tahlillerim"], ["/family", "Aile"], ["/plans", "Planlar"], ["/settings", "Ayarlar"],
 ];
 
 export function HeaderWithBranding() {

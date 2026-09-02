@@ -40,37 +40,37 @@ export default function MedicationsPage() {
   const { activeProfile } = useProfile();
   const [loadedProfileId, setLoadedProfileId] = useState("");
 
-  useEffect(() => { const saved = localStorage.getItem(`${STORAGE_KEY}-${activeProfile.id}`); setMedications(saved ? JSON.parse(saved) : activeProfile.id === "emir" ? demoMedications : []); setTaken([]); setLoadedProfileId(activeProfile.id); }, [activeProfile.id]);
-  useEffect(() => { if (loadedProfileId === activeProfile.id) localStorage.setItem(`${STORAGE_KEY}-${activeProfile.id}`, JSON.stringify(medications)); }, [activeProfile.id, loadedProfileId, medications]);
+  useEffect(() => { const saved = localStorage.getItem(`${STORAGE_KEY}-${activeProfile.dataProfileId}`); setMedications(saved ? JSON.parse(saved) : activeProfile.access === "owner" ? demoMedications : []); setTaken([]); setLoadedProfileId(activeProfile.dataProfileId); }, [activeProfile.dataProfileId, activeProfile.access]);
+  useEffect(() => { if (loadedProfileId === activeProfile.dataProfileId) localStorage.setItem(`${STORAGE_KEY}-${activeProfile.dataProfileId}`, JSON.stringify(medications)); }, [activeProfile.dataProfileId, loadedProfileId, medications]);
   useEffect(() => {
     const onServiceWorkerMessage = (event: MessageEvent) => {
-      if (event.data?.type !== "DOSE_TAKEN" || event.data.detail?.profileId !== activeProfile.id) return;
+      if (event.data?.type !== "DOSE_TAKEN" || event.data.detail?.profileId !== activeProfile.dataProfileId) return;
       const medicationId = event.data.detail.medicationId as string;
-      recordDoseConfirmation(activeProfile.id, medicationId, event.data.detail.scheduledTime);
+      recordDoseConfirmation(activeProfile.dataProfileId, medicationId, event.data.detail.scheduledTime);
       queueOfflineDose({ medicationId, takenAt: new Date().toISOString() }); setTaken((items) => items.includes(medicationId) ? items : [...items, medicationId]);
     };
     navigator.serviceWorker?.addEventListener("message", onServiceWorkerMessage);
     return () => navigator.serviceWorker?.removeEventListener("message", onServiceWorkerMessage);
-  }, [activeProfile.id]);
+  }, [activeProfile.dataProfileId]);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const medicationId = params.get("confirm");
-    if (!medicationId || params.get("profile") !== activeProfile.id) return;
-    recordDoseConfirmation(activeProfile.id, medicationId, params.get("time") ?? undefined);
+    if (!medicationId || params.get("profile") !== activeProfile.dataProfileId) return;
+    recordDoseConfirmation(activeProfile.dataProfileId, medicationId, params.get("time") ?? undefined);
     queueOfflineDose({ medicationId, takenAt: new Date().toISOString() }); setTaken((items) => items.includes(medicationId) ? items : [...items, medicationId]);
     window.history.replaceState({}, "", "/medications");
-  }, [activeProfile.id]);
+  }, [activeProfile.dataProfileId]);
   const suggestions = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase("tr-TR");
     return manualMode || selectedMedicine || normalized.length < 2 ? [] : medicineCatalog.filter((item) => item.name.toLocaleLowerCase("tr-TR").includes(normalized)).slice(0, 8);
   }, [manualMode, query, selectedMedicine]);
   const confirm = (id: string, insulin?: boolean) => {
     if (insulin) { setPendingInsulinId(id); setShowSite(true); return; }
-    recordDoseConfirmation(activeProfile.id, id); queueOfflineDose({ medicationId: id, takenAt: new Date().toISOString() }); setTaken((v) => v.includes(id) ? v : [...v, id]);
+    recordDoseConfirmation(activeProfile.dataProfileId, id); queueOfflineDose({ medicationId: id, takenAt: new Date().toISOString() }); setTaken((v) => v.includes(id) ? v : [...v, id]);
   };
   const confirmInsulin = () => {
     if (!pendingInsulinId) return;
-    recordDoseConfirmation(activeProfile.id, pendingInsulinId); queueOfflineDose({ medicationId: pendingInsulinId, takenAt: new Date().toISOString(), injectionSite: site });
+    recordDoseConfirmation(activeProfile.dataProfileId, pendingInsulinId); queueOfflineDose({ medicationId: pendingInsulinId, takenAt: new Date().toISOString(), injectionSite: site });
     setTaken((v) => v.includes(pendingInsulinId) ? v : [...v, pendingInsulinId]); setShowSite(false); setPendingInsulinId(undefined);
   };
   const chooseSuggestion = (item: (typeof medicineCatalog)[number]) => { setSelectedMedicine(item); setQuery(item.name); setPackageCount(item.packageCount); setForm(item.form as MedicationForm); };

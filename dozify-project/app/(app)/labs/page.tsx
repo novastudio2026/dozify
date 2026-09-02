@@ -15,8 +15,8 @@ export default function LabsPage() {
   const { activeProfile } = useProfile();
   const [results, setResults] = useState<LabResult[]>(demoLabs); const [adding, setAdding] = useState(false); const [deleteId, setDeleteId] = useState<string>(); const [loadedProfileId, setLoadedProfileId] = useState("");
   const [selected, setSelected] = useState<LabDefinition>(); const [value, setValue] = useState(""); const [refMin, setRefMin] = useState(0); const [refMax, setRefMax] = useState(0); const [editRange, setEditRange] = useState(false); const [category, setCategory] = useState(labCategories[0]);
-  useEffect(() => { const saved = localStorage.getItem(`dozify-demo-labs-${activeProfile.id}`); setResults(saved ? JSON.parse(saved) : activeProfile.id === "emir" ? demoLabs : []); setLoadedProfileId(activeProfile.id); }, [activeProfile.id]);
-  useEffect(() => { if (loadedProfileId === activeProfile.id) localStorage.setItem(`dozify-demo-labs-${activeProfile.id}`, JSON.stringify(results)); }, [activeProfile.id, loadedProfileId, results]);
+  useEffect(() => { const saved = localStorage.getItem(`dozify-demo-labs-${activeProfile.dataProfileId}`); setResults(saved ? JSON.parse(saved) : activeProfile.access === "owner" ? demoLabs : []); setLoadedProfileId(activeProfile.dataProfileId); }, [activeProfile.dataProfileId, activeProfile.access]);
+  useEffect(() => { if (loadedProfileId === activeProfile.dataProfileId) localStorage.setItem(`dozify-demo-labs-${activeProfile.dataProfileId}`, JSON.stringify(results)); }, [activeProfile.dataProfileId, loadedProfileId, results]);
   const categoryTests = labCatalog.filter((test) => test.category === category);
   const chooseTest = (test: LabDefinition) => { setSelected(test); setRefMin(test.refMin); setRefMax(test.refMax); setEditRange(false); };
   const preview: LabResult | undefined = selected && value !== "" ? { id: "preview", testName: selected.name, value: Number(value), unit: selected.unit, refMin, refMax, testDate: "" } : undefined;

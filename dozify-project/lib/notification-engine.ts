@@ -7,9 +7,9 @@ const REMINDER_KEY = "dozify-reminder-last-sent";
 const RETRY_MINUTES = 10;
 const dayKey = () => new Date().toISOString().slice(0, 10);
 
-function profiles() {
+function profiles(): string[] {
   const saved = localStorage.getItem("dozify-family-profiles");
-  return saved ? JSON.parse(saved).map((profile: { id: string }) => profile.id) : ["emir"];
+  return saved ? Array.from(new Set<string>(JSON.parse(saved).map((profile: { dataProfileId?: string; id: string }) => profile.dataProfileId || profile.id))) : [];
 }
 function toTodayTime(time: string) { const [hours, minutes] = time.trim().split(":").map(Number); const target = new Date(); target.setHours(hours, minutes, 0, 0); return target; }
 
